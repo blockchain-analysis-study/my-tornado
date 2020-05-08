@@ -36,46 +36,60 @@ function generateDeposit() {
   }
 
 
-  
+  // 求出 nullifier 和 secret 组合的 Hash, 即 commitment
   const preimage = Buffer.concat([deposit.nullifier.leInt2Buff(31), deposit.secret.leInt2Buff(31)])
   deposit.commitment = pedersenHash(preimage)
   return deposit
 }
 
 contract('ERC20Tornado', accounts => {
-  let tornado
-  let token
-  let usdtToken
-  let badRecipient
-  const sender = accounts[0]
-  const operator = accounts[0]
-  const levels = MERKLE_TREE_HEIGHT || 16
-  let tokenDenomination = TOKEN_AMOUNT || '1000000000000000000' // 1 ether
-  let snapshotId
+
+  let tornado // tornado 合约
+  let token // ERC20 token 合约
+  let usdtToken //
+  let badRecipient //
+  const sender = accounts[0] // 交易发送人
+  const operator = accounts[0] // tornado 合约的允许操作人
+  const levels = MERKLE_TREE_HEIGHT || 16 // 如果配置中有定义 `MERKLE_TREE_HEIGHT` 那么就用 `MERKLE_TREE_HEIGHT`, 否则 默认 16 层 merkle tree
+  let tokenDenomination = TOKEN_AMOUNT || '1000000000000000000' // 1 ether // 转账的面值, 有配置用配置的,没有就用默认 1*1^18 wei
+  let snapshotId //
   let prefix = 'test'
-  let tree
-  const fee = bigInt(ETH_AMOUNT).shr(1) || bigInt(1e17)
-  const refund = ETH_AMOUNT || '1000000000000000000' // 1 ether
-  let recipient = getRandomRecipient()
-  const relayer = accounts[1]
+  let tree // merkle tree 实例
+  const fee = bigInt(ETH_AMOUNT).shr(1) || bigInt(1e17) // 提款费用
+  const refund = ETH_AMOUNT || '1000000000000000000' // 1 ether // 需要释放的资金
+  let recipient = getRandomRecipient() // 提款接收人
+  const relayer = accounts[1] // 提款中继人
+
   let groth16
   let circuit
   let proving_key
 
+
+  // 准备工作
   before(async () => {
+
+    // 构造一颗空的 MerkleTree
     tree = new MerkleTree(
       levels,
       null,
       prefix,
     )
+
+    // 部署 tornado 合约
     tornado = await Tornado.deployed()
     if (ERC20_TOKEN) {
       token = await Token.at(ERC20_TOKEN)
       usdtToken = await USDTToken.at(ERC20_TOKEN)
     } else {
+
+      // 部署 ERC20 合约
       token = await Token.deployed()
+
+      // 这一步,不清楚是做什么的? 和AZTEC 的 mint 一个样??
       await token.mint(sender, tokenDenomination)
     }
+
+
     badRecipient = await BadRecipient.new()
     snapshotId = await takeSnapshot()
     groth16 = await buildGroth16()
