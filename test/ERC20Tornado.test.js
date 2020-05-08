@@ -97,18 +97,26 @@ contract('ERC20Tornado', accounts => {
     proving_key = fs.readFileSync('build/circuits/withdraw_proving_key.bin').buffer
   })
 
+  // 初始化
   describe('#constructor', () => {
     it('should initialize', async () => {
+      // 返回 Tornado 合约中的 token 字段对应的 ERC20 token 合约
       const tokenFromContract = await tornado.token()
+
+      // 判断下 token 合约的地址是否相等
       tokenFromContract.should.be.equal(token.address)
     })
   })
 
+
+  // 抵押
   describe('#deposit', () => {
     it('should work', async () => {
       const commitment = toFixedHex(43)
       await token.approve(tornado.address, tokenDenomination)
 
+
+      // 发起 抵押
       let { logs } = await tornado.deposit(commitment, { from: sender })
 
       logs[0].event.should.be.equal('Deposit')
@@ -144,6 +152,7 @@ contract('ERC20Tornado', accounts => {
 
       const { root, path_elements, path_index } = await tree.path(0)
       // Circuit input
+      // 电路输入
       const input = stringifyBigInts({
         // public
         root,
