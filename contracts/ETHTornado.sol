@@ -22,10 +22,13 @@ contract ETHTornado is Tornado {
   ) Tornado(_verifier, _denomination, _merkleTreeHeight, _operator) public {
   }
 
+  // 发起质押 ETH
   function _processDeposit() internal {
     require(msg.value == denomination, "Please send `mixDenomination` ETH along with transaction");
   }
 
+
+  // 发起提款 ETH
   function _processWithdraw(address payable _recipient, address payable _relayer, uint256 _fee, uint256 _refund) internal {
     // sanity checks
     require(msg.value == 0, "Message value is supposed to be zero for ETH instance");
