@@ -200,6 +200,33 @@ async function generateSnarkProof(deposit, recipient) {
   return { proof, args }
 }
 
+
+/**
+ * 关于 Tornado 的 抵押 和 提款
+ *
+ *  [抵押]
+ *  - 生成一个随机的 secret 和一个 nullifier
+ *  - 然后计算 secret和nullifier的Hash: pedersenHash(secret, nullifier) => commitment
+ *  - 检查用户发送的ETH金额正确性
+ *  - 将用户的 commitment 插入到 tree 中 (tree 是一颗 commitment 组成的 merkle树)
+ *
+ *
+ *  [提款]
+ *  - 用户证明他知道某些叶子的Merkle路径和该叶子的原像
+ *  - 用户仅显示其承诺的无效符部分 (nullifier part of his commitment)，用于跟踪被使用过的 notes
+ *  - 用户提供提款地址 <接收人>，并向提交提款交易的地址<中继人> 支付可选费用
+ *  - 校验 SNARK proof
+ *  - 检查是否未使用nullifier
+ *  - 保存 nullifier (save nullifier)
+ *  - 释放资金 (release funds)
+ *
+ * @returns {Promise<void>}
+ */
+
+
+
+
+
 // 最小示例
 async function main() {
   web3 = new Web3(new Web3.providers.HttpProvider(RPC_URL, { timeout: 5 * 60 * 1000 }), null, { transactionConfirmationBlocks: 1 })

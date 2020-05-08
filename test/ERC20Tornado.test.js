@@ -29,10 +29,14 @@ const toFixedHex = (number, length = 32) =>  '0x' + bigInt(number).toString(16).
 const getRandomRecipient = () => rbigint(20)
 
 function generateDeposit() {
+  // 生成 deposit
   let deposit = {
     secret: rbigint(31),
     nullifier: rbigint(31),
   }
+
+
+  
   const preimage = Buffer.concat([deposit.nullifier.leInt2Buff(31), deposit.secret.leInt2Buff(31)])
   deposit.commitment = pedersenHash(preimage)
   return deposit
