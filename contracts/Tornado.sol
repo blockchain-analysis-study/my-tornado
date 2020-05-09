@@ -39,6 +39,7 @@ contract Tornado is MerkleTreeWithHistory, ReentrancyGuard {
   // we store all commitments just to prevent accidental deposits with the same commitment
   //
   // 我们存储 所有承诺 只是为了防止相同承诺的意外(质押)存款
+  // 全部的, 里面的东西不会修改的
   mapping(bytes32 => bool) public commitments;
 
   // 一个外部的验证合约, 此处为马甲合约
