@@ -133,6 +133,7 @@ contract('ERC20Tornado', accounts => {
     })
   })
 
+  // 提款
   describe('#withdraw', () => {
     it('should work', async () => {
       const deposit = generateDeposit()
@@ -169,7 +170,7 @@ contract('ERC20Tornado', accounts => {
         pathIndices: path_index,
       })
 
-
+      // groth16 是一个 算法
       const proofData = await websnarkUtils.genWitnessAndProve(groth16, input, circuit, proving_key)
       const { proof } = websnarkUtils.toSolidityInput(proofData)
 

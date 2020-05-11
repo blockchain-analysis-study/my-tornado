@@ -114,7 +114,7 @@ contract MerkleTreeWithHistory {
   }
 
 
-  // 插入一个叶子节点
+  // 插入一个叶子节点 (主要是插入 commitment)
   function _insert(bytes32 _leaf) internal returns(uint32 index) {
     uint32 currentIndex = nextIndex; // 获取当前可以被插入tree 的索引
 
@@ -127,9 +127,9 @@ contract MerkleTreeWithHistory {
     // 记录当前叶子结点
     bytes32 currentLevelHash = _leaf;
 
-    // 左节点
+    // 左节点临时量
     bytes32 left;
-    // 右节点
+    // 右节点临时量
     bytes32 right;
 
     // 根据层数来遍历
@@ -143,7 +143,9 @@ contract MerkleTreeWithHistory {
       //        /   \   /   \
       //       0     1 2      3          2^2     第0层   所以, 0 <= nextIndex < 2^2
       //
-      // 最开始从 4 索引开始放 数据
+      //
+      //
+      // 最开始从叶子节点 0 索引开始放数据,一直放到3索引位置，则上面这颗tree只能容纳4个元素
       // 可知, index % 2 == 0 的位置为 左节点 (整除)
       //
       if (currentIndex % 2 == 0) {
@@ -171,13 +173,13 @@ contract MerkleTreeWithHistory {
       currentIndex /= 2; // 决定下一次 for 是 先修改 上一层的 左节点 还是 右节点
     }
 
-    // 计算出 当前叶子结点在整棵树中的 位置
+    // 计算出本次最新的root应该在最近100个root集合中放置的位置
     currentRootIndex = (currentRootIndex + 1) % ROOT_HISTORY_SIZE; //  (0 ~ 99)
 
-    // 在对应的位置 存放对应的叶子结点
+    // 最近100个root窗口集的对应位置放置当前root
     roots[currentRootIndex] = currentLevelHash;
 
-    // 返回当前索引
+    // 返回当前叶子结点插入索引, 即已经插入第几个叶子节点了
     return nextIndex - 1;
   }
 

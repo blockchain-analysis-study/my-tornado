@@ -77,8 +77,8 @@ contract Tornado is MerkleTreeWithHistory, ReentrancyGuard {
   // _operator: 操作人地址（请参阅上面的操作人评论）
   constructor(
     IVerifier _verifier,
-    uint256 _denomination, // 每次质押时的都需要实例化 Tornado 合约,并且存入本次质押/提款的金额
-    uint32 _merkleTreeHeight,
+    uint256 _denomination, // 指定本合约每次交易 存款/提款的金额 (每次交易一定是这么，不能多也不能少)
+    uint32 _merkleTreeHeight, // 当前 tornado合约中的 merkle tree 的层数, 决定了tornado合约总共可以有多少笔存款
     address _operator
   )
   // 初始化 父合约的构造器  MerkleTreeWithHistory()
@@ -107,6 +107,8 @@ contract Tornado is MerkleTreeWithHistory, ReentrancyGuard {
     // =======================================
     // =======================================
     uint32 insertedIndex = _insert(_commitment);
+
+    // 将 承诺追加到全局的 commitment集合中
     commitments[_commitment] = true;
 
     // 然后再做 token 的转移
